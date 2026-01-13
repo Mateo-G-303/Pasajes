@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Gestión de Unidades (Buses)</h2>
+
+<div class="card p-3 mb-4">
+    <form action="{{ url_for('unidades.crear') }}" method="POST" class="row g-3">
+        <div class="col-md-4">
+            <input type="text" name="placa" class="form-control" placeholder="Placa (ej: IBA-1234)" required>
+        </div>
+        <div class="col-md-3">
+            <input type="number" name="disco" class="form-control" placeholder="# Disco" required>
+        </div>
+        <div class="col-md-3">
+            <input type="number" name="capacidad" class="form-control" placeholder="Capacidad" required>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-success w-100">Guardar</button>
+        </div>
+    </form>
+</div>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Placa</th>
+            <th>Disco</th>
+            <th>Capacidad</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for u in unidades %}
+        <tr>
+            <td>{{ u[0] }}</td>
+            <td>{{ u[1] }}</td>
+            <td>{{ u[2] }}</td>
+            <td>{{ u[3] }} Pasajeros</td>
+            <td>
+                <a href="{{ url_for('unidades.eliminar', id=u[0]) }}" class="btn btn-danger btn-sm" onclick="return confirm('¿Borrar unidad?');">Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

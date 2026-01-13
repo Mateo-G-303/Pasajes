@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="jumbotron mt-5 text-center">
+    <h1 class="display-4">Bienvenido al Sistema de Transporte</h1>
+    <p class="lead">Sistema de gestión de pasajes, rutas y unidades 🔍 .</p>
+    <hr class="my-4">
+    <p>Utiliza el menú de navegación para comenzar a administrar.</p>
+    <a class="btn btn-primary btn-lg" href="{{ url_for('pasajes.index') }}" role="button">Ir a la Gestión de Pasajes</a>
+</div>
+{% endblock %}
