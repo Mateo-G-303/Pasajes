@@ -100,28 +100,24 @@ def editar(id):
             id_ruta = int(request.form['id_ruta'])
             id_unidad = int(request.form['id_unidad'])
             id_tipo = int(request.form['id_tipo'])
-            
-            # --- Lógica de recalculo ---
-            precio_base = 10.0 
+            valor_base = float(request.form['valor'])
+
             cursor.execute("SELECT descuento FROM TIPOS_PASAJE WHERE id_tipo = :1", [id_tipo])
             descuento = cursor.fetchone()[0]
-            nuevo_valor = precio_base * (1 - (descuento / 100))
+            nuevo_valor = valor_base * (1 - (descuento / 100))
             
             sql = """UPDATE PASAJES SET id_ruta=:1, id_unidad=:2, id_tipo=:3, valor_pasaje=:4 
                      WHERE id_pasaje=:5"""
             cursor.execute(sql, [id_ruta, id_unidad, id_tipo, nuevo_valor, id])
             conn.commit()
             conn.close()
-            # Después de guardar, REDIRIGIMOS (esto es un return válido)
             return redirect(url_for('pasajes.index'))
             
         except Exception as e:
             print(f"Error al editar: {e}")
             conn.close()
-            return redirect(url_for('pasajes.index')) # Return en caso de error
+            return redirect(url_for('pasajes.index')) 
 
-    # --- MÉTODO GET (Cuando cargamos la página) ---
-    # Esta parte es la que te faltaba asegurar que SIEMPRE retorne algo
     cursor.execute("SELECT * FROM PASAJES WHERE id_pasaje = :1", [id])
     pasaje = cursor.fetchone()
     
@@ -134,7 +130,6 @@ def editar(id):
     
     conn.close()
     
-    # Este es el return que soluciona el TypeError
     return render_template('editar_pasaje.html', 
                            pasaje=pasaje, 
                            rutas=rutas, 
