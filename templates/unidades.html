@@ -38,7 +38,10 @@
             <td>{{ u[2] }}</td>
             <td>{{ u[3] }} Pasajeros</td>
             <td>
-                <a href="{{ url_for('unidades.eliminar', id=u[0]) }}" class="btn btn-danger btn-sm" onclick="return confirm('¿Borrar unidad?');">Eliminar</a>
+                <a href="{{ url_for('unidades.editar', id=u[0]) }}" class="btn btn-warning btn-sm">Editar</a>
+
+                <a href="{{ url_for('unidades.eliminar', id=u[0]) }}" class="btn btn-danger btn-sm"
+                    onclick="return confirm('¿Estás seguro de eliminar esta unidad?');">Eliminar</a>
             </td>
         </tr>
         {% endfor %}

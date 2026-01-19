@@ -30,6 +30,23 @@ def crear():
         conn.close()
     return redirect(url_for('unidades.index'))
 
+@unidades_bp.route('/editar/<int:id>', methods=['GET', 'POST'])
+def editar(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    if request.method == 'POST':
+        disco = request.form['numero_disco']
+        cursor.execute("UPDATE UNIDADES SET numero_disco=:1 WHERE id_unidad=:2", [disco, id])
+        conn.commit()
+        conn.close()
+        return redirect(url_for('unidades.index'))
+
+    cursor.execute("SELECT * FROM UNIDADES WHERE id_unidad = :1", [id])
+    unidad = cursor.fetchone()
+    conn.close()
+    return render_template('editar_unidad.html', unidad=unidad)
+
 @unidades_bp.route('/eliminar/<int:id>')
 def eliminar(id):
     conn = get_db_connection()

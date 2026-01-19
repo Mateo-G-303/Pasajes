@@ -25,6 +25,26 @@ def crear():
     conn.close()
     return redirect(url_for('tipos.index'))
 
+@tipos_bp.route('/editar/<int:id>', methods=['GET', 'POST'])
+def editar(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    if request.method == 'POST':
+        descripcion = request.form['descripcion']
+        descuento = float(request.form['descuento'])
+        
+        cursor.execute("UPDATE TIPOS_PASAJE SET descripcion=:1, descuento=:2 WHERE id_tipo=:3", 
+                       [descripcion, descuento, id])
+        conn.commit()
+        conn.close()
+        return redirect(url_for('tipos.index'))
+
+    cursor.execute("SELECT * FROM TIPOS_PASAJE WHERE id_tipo = :1", [id])
+    tipo = cursor.fetchone()
+    conn.close()
+    return render_template('editar_tipo.html', tipo=tipo)
+
 @tipos_bp.route('/eliminar/<int:id>')
 def eliminar(id):
     conn = get_db_connection()

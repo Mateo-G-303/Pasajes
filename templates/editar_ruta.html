@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Editar Ruta</h2>
+<div class="card p-4">
+    <form action="{{ url_for('rutas.editar', id=ruta[0]) }}" method="POST">
+        <div class="mb-3">
+            <label>Nombre Ruta</label>
+            <input type="text" name="nombre" class="form-control" value="{{ ruta[1] }}" required>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <label>Origen</label>
+                <input type="text" name="origen" class="form-control" value="{{ ruta[2] }}" required>
+            </div>
+            <div class="col-md-4">
+                <label>Destino</label>
+                <input type="text" name="destino" class="form-control" value="{{ ruta[3] }}" required>
+            </div>
+            <div class="col-md-4">
+                <label>Valor Base ($)</label>
+                <input type="number" step="0.01" name="valor" class="form-control" value="{{ ruta[4] }}" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-warning mt-3">Actualizar Ruta</button>
+        <a href="{{ url_for('rutas.index') }}" class="btn btn-secondary mt-3">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

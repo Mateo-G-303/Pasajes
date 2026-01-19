@@ -5,16 +5,19 @@
 
 <div class="card p-3 mb-4">
     <form action="{{ url_for('rutas.crear') }}" method="POST" class="row g-3">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <input type="text" name="nombre" class="form-control" placeholder="Nombre Ruta" required>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <input type="text" name="origen" class="form-control" placeholder="Origen" required>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <input type="text" name="destino" class="form-control" placeholder="Destino" required>
         </div>
         <div class="col-md-2">
+            <input type="number" step="0.01" min="0" name="valor" class="form-control" placeholder="Valor ($)" required>
+        </div>
+        <div class="col-md-3">
             <button type="submit" class="btn btn-success w-100">Agregar</button>
         </div>
     </form>
@@ -27,6 +30,7 @@
             <th>Nombre</th>
             <th>Origen</th>
             <th>Destino</th>
+            <th>Valor ($)</th>
             <th>Acción</th>
         </tr>
     </thead>
@@ -37,9 +41,14 @@
             <td>{{ ruta[1] }}</td>
             <td>{{ ruta[2] }}</td>
             <td>{{ ruta[3] }}</td>
+            <td>${{ ruta[4] }}</td>
             <td>
+            <td>
+                <a href="{{ url_for('rutas.editar', id=ruta[0]) }}" class="btn btn-warning btn-sm">Editar</a>
                 <a href="{{ url_for('rutas.eliminar', id=ruta[0]) }}" class="btn btn-danger btn-sm">Eliminar</a>
             </td>
+            </td>
+
         </tr>
         {% endfor %}
     </tbody>

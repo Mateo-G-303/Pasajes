@@ -6,7 +6,6 @@ import io
 
 pasajes_bp = Blueprint('pasajes', __name__, url_prefix='/pasajes')
 
-
 @pasajes_bp.route('/')
 def index():
     conn = get_db_connection()
@@ -16,8 +15,15 @@ def index():
     fecha_inicio = request.args.get('fecha_inicio')
     fecha_fin = request.args.get('fecha_fin')
     
+    # CALCULAMOS EL VALOR AL VUELO: (valor_base de ruta) * (1 - descuento/100)
     sql = """
-        SELECT p.id_pasaje, r.nombre_ruta, u.numero_disco, tp.descripcion, p.valor_pasaje, p.fecha_viaje 
+        SELECT 
+            p.id_pasaje, 
+            r.nombre_ruta, 
+            u.numero_disco, 
+            tp.descripcion, 
+            (r.valor_base * (1 - (tp.descuento / 100))) as valor_calculado, 
+            p.fecha_viaje 
         FROM PASAJES p
         JOIN RUTAS r ON p.id_ruta = r.id_ruta
         JOIN UNIDADES u ON p.id_unidad = u.id_unidad
@@ -68,25 +74,16 @@ def crear():
         id_ruta = int(request.form['id_ruta'])
         id_unidad = int(request.form['id_unidad'])
         id_tipo = int(request.form['id_tipo'])
-        valor_base = float(request.form['valor'])
         
-        cursor.execute("SELECT descuento FROM TIPOS_PASAJE WHERE id_tipo = :1", [id_tipo])
-        resultado = cursor.fetchone()
-        
-        if resultado:
-            porcentaje_descuento = float(resultado[0])
-            valor_final = valor_base * (1 - (porcentaje_descuento / 100))
-        else:
-            valor_final = valor_base
-
-        sql = """INSERT INTO PASAJES (id_ruta, id_unidad, id_tipo, valor_pasaje, fecha_viaje) 
-                 VALUES (:1, :2, :3, :4, SYSDATE)"""
-        cursor.execute(sql, [id_ruta, id_unidad, id_tipo, valor_final])
+        # EL INSERT ES MÁS LIMPIO: Ya no guardamos el valor_pasaje físicamente
+        sql = """INSERT INTO PASAJES (id_ruta, id_unidad, id_tipo, fecha_viaje) 
+                 VALUES (:1, :2, :3, SYSDATE)"""
+        cursor.execute(sql, [id_ruta, id_unidad, id_tipo])
         
         conn.commit()
         conn.close()
     except Exception as e:
-        print(f"Error al calcular o registrar pasaje: {e}")
+        print(f"Error al registrar pasaje: {e}")
         
     return redirect(url_for('pasajes.index'))
 
@@ -100,25 +97,23 @@ def editar(id):
             id_ruta = int(request.form['id_ruta'])
             id_unidad = int(request.form['id_unidad'])
             id_tipo = int(request.form['id_tipo'])
-            valor_base = float(request.form['valor'])
-
-            cursor.execute("SELECT descuento FROM TIPOS_PASAJE WHERE id_tipo = :1", [id_tipo])
-            descuento = cursor.fetchone()[0]
-            nuevo_valor = valor_base * (1 - (descuento / 100))
             
-            sql = """UPDATE PASAJES SET id_ruta=:1, id_unidad=:2, id_tipo=:3, valor_pasaje=:4 
-                     WHERE id_pasaje=:5"""
-            cursor.execute(sql, [id_ruta, id_unidad, id_tipo, nuevo_valor, id])
+            # SOLO ACTUALIZAMOS LAS RELACIONES: El precio se recalcula solo en el SELECT
+            sql = """UPDATE PASAJES SET id_ruta=:1, id_unidad=:2, id_tipo=:3 
+                     WHERE id_pasaje=:4"""
+            cursor.execute(sql, [id_ruta, id_unidad, id_tipo, id])
+            
             conn.commit()
             conn.close()
             return redirect(url_for('pasajes.index'))
             
         except Exception as e:
             print(f"Error al editar: {e}")
-            conn.close()
+            if conn: conn.close()
             return redirect(url_for('pasajes.index')) 
 
-    cursor.execute("SELECT * FROM PASAJES WHERE id_pasaje = :1", [id])
+    # Bloque GET para cargar el formulario de edición
+    cursor.execute("SELECT id_pasaje, id_ruta, id_unidad, id_tipo FROM PASAJES WHERE id_pasaje = :1", [id])
     pasaje = cursor.fetchone()
     
     cursor.execute("SELECT id_ruta, nombre_ruta FROM RUTAS")
@@ -135,7 +130,6 @@ def editar(id):
                            rutas=rutas, 
                            unidades=unidades, 
                            tipos=tipos)
-    
 
 @pasajes_bp.route('/eliminar/<int:id>')
 def eliminar(id):
@@ -154,6 +148,7 @@ def exportar_csv():
     conn = get_db_connection()
     cursor = conn.cursor()
     out_cursor = cursor.var(oracledb.CURSOR)
+    # Asegúrate de que tu SP_EXPORTAR_CSV_PASAJES también se actualice para no buscar la columna borrada
     cursor.callproc('SP_EXPORTAR_CSV_PASAJES', [out_cursor])
     
     filas = out_cursor.getvalue().fetchall()

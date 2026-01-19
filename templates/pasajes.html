@@ -9,15 +9,15 @@
     </div>
     <div class="card-body">
         <form action="{{ url_for('pasajes.index') }}" method="GET" class="row g-3 align-items-end">
-            
+
             <div class="col-md-4">
                 <label class="form-label">Filtrar por Ruta:</label>
                 <select name="id_ruta" class="form-select">
                     <option value="">-- Todas las Rutas --</option>
                     {% for r in rutas %}
-                        <option value="{{ r[0] }}" {% if filtro_ruta and filtro_ruta|int == r[0] %}selected{% endif %}>
-                            {{ r[1] }}
-                        </option>
+                    <option value="{{ r[0] }}" {% if filtro_ruta and filtro_ruta|int==r[0] %}selected{% endif %}>
+                        {{ r[1] }}
+                    </option>
                     {% endfor %}
                 </select>
             </div>
@@ -26,7 +26,7 @@
                 <label class="form-label">Desde:</label>
                 <input type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio }}">
             </div>
-            
+
             <div class="col-md-3">
                 <label class="form-label">Hasta:</label>
                 <input type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin }}">
@@ -43,36 +43,32 @@
 
 <div class="card p-3 mb-4 bg-light">
     <form action="{{ url_for('pasajes.crear') }}" method="POST" class="row g-3">
-        <div class="col-md-3">
-            <label>Ruta</label>
-            <select name="id_ruta" class="form-select">
+        <div class="col-md-4">
+            <label>Ruta (Define el Precio Base)</label>
+            <select name="id_ruta" class="form-select" required>
                 {% for r in rutas %}
-                    <option value="{{ r[0] }}">{{ r[1] }}</option>
+                <option value="{{ r[0] }}">{{ r[1] }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="col-md-3">
             <label>Unidad (Disco)</label>
-            <select name="id_unidad" class="form-select">
+            <select name="id_unidad" class="form-select" required>
                 {% for u in unidades %}
-                    <option value="{{ u[0] }}">{{ u[1] }}</option>
+                <option value="{{ u[0] }}">{{ u[1] }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="col-md-3">
-            <label>Tipo Pasaje</label>
-            <select name="id_tipo" class="form-select">
+            <label>Tipo Pasaje (Aplica Descuento)</label>
+            <select name="id_tipo" class="form-select" required>
                 {% for t in tipos %}
-                    <option value="{{ t[0] }}">{{ t[1] }}</option>
+                <option value="{{ t[0] }}">{{ t[1] }}</option>
                 {% endfor %}
             </select>
         </div>
-        <div class="col-md-2">
-            <label>Valor ($)</label>
-            <input type="number" step="0.01" name="valor" class="form-control" required>
-        </div>
-        <div class="col-md-1 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary w-100">+</button>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Vender Pasaje</button>
         </div>
     </form>
 </div>
@@ -87,9 +83,10 @@
             <th>Ruta</th>
             <th>Unidad</th>
             <th>Tipo</th>
-            <th>Valor</th>
+            <th>Valor Final</th>
             <th>Fecha</th>
-            <th>Acciones</th> </tr>
+            <th>Acciones</th>
+        </tr>
     </thead>
     <tbody>
         {% for p in pasajes %}
@@ -101,8 +98,9 @@
             <td>{{ p[5] }}</td>
             <td>
                 <a href="{{ url_for('pasajes.editar', id=p[0]) }}" class="btn btn-warning btn-sm">✏️ Editar</a>
-                
-                <a href="{{ url_for('pasajes.eliminar', id=p[0]) }}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este pasaje?');">🗑️ Eliminar</a>
+
+                <a href="{{ url_for('pasajes.eliminar', id=p[0]) }}" class="btn btn-danger btn-sm"
+                    onclick="return confirm('¿Estás seguro de eliminar este pasaje?');">🗑️ Eliminar</a>
             </td>
         </tr>
         {% endfor %}

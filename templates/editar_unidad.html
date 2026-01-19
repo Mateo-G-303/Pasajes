@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Editar Unidad</h2>
+<div class="card p-4 col-md-6 mx-auto">
+    <form action="{{ url_for('unidades.editar', id=unidad[0]) }}" method="POST">
+        <div class="mb-3">
+            <label>Número de Disco</label>
+            <input type="number" name="numero_disco" class="form-control" value="{{ unidad[1] }}" required>
+        </div>
+        <button type="submit" class="btn btn-warning">Guardar Cambios</button>
+        <a href="{{ url_for('unidades.index') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
